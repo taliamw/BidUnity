@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import axios from 'axios';
-
+import '@passageidentity/passage-elements/passage-auth'
 const Login = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
