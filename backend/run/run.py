@@ -13,6 +13,27 @@ app.config['MYSQL_CURSORCLASS'] = 'DictCursor'  # Fetch results as dictionaries
 
 mysql = MySQL(app)
 
+# Route to fetch roles
+@app.route('/roles', methods=['GET'])
+def get_roles():
+    try:
+        # Establish database connection
+        cur = mysql.connection.cursor()
+
+        # Execute SQL query to fetch roles
+        cur.execute("SELECT role_id, role_name FROM roles")
+
+        # Fetch all roles from the result set
+        roles = cur.fetchall()
+
+        # Close cursor
+        cur.close()
+
+        # Return roles as JSON response
+        return jsonify(roles)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
 @app.route('/submit-form', methods=['POST'])
 def submit_form():
     try:
