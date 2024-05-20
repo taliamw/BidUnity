@@ -1,7 +1,9 @@
 from flask import Flask, request, jsonify
 from flask_mysqldb import MySQL
+from flask_cors import CORS
 
 app = Flask(__name__)
+CORS(app)  # This will enable CORS for all routes
 
 # Configure MySQL connection
 app.config['MYSQL_HOST'] = 'localhost'
@@ -27,6 +29,21 @@ def submit_form():
 
     # Return a response
     return jsonify({'message': 'Form submitted successfully'})
+
+@app.route('/login', methods=['GET'])
+def login():
+    username = request.args.get('username')
+    password = request.args.get('password')
+
+    cursor = mysql.connection.cursor()
+    cursor.execute("SELECT * FROM users WHERE username = %s AND password = %s", (username, password))
+    user = cursor.fetchone()
+    cursor.close()
+
+    if user:
+        return jsonify({'message': 'Login successful', 'user': user})
+    else:
+        return jsonify({'message': 'Invalid username or password'}), 401
 
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0', port=5000)

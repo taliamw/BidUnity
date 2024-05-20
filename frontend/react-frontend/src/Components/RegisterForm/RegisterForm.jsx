@@ -1,14 +1,19 @@
 import React, { useState } from "react";
 import './RegisterForm.css'; // Create and style this CSS file as needed
-import { FaUser, FaLock } from "react-icons/fa";
-import { Link } from 'react-router-dom';
+import { FaUser, FaLock, FaInfoCircle } from "react-icons/fa";
+import { Link, useNavigate} from 'react-router-dom';
 
 const RegisterForm = () => {
     const [formData, setFormData] = useState({
         username: '',
         password: '',
+        confirmPassword: '',
         email: ''
     });
+
+    const [passwordError, setPasswordError] = useState('');
+
+    const navigate = useNavigate(); // Initialize useNavigate hook
 
     const handleChange = (e) => {
         const { name, value } = e.target;
@@ -17,6 +22,15 @@ const RegisterForm = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        if (formData.password.length < 8) {
+            setPasswordError('Password must be at least 8 characters long');
+            return;
+        }
+        if (formData.password !== formData.confirmPassword) {
+            setPasswordError('Passwords do not match');
+            return;
+        }
+        setPasswordError('');
         try {
             const response = await fetch('http://localhost:5000/submit-form', {
                 method: 'POST',
@@ -27,6 +41,7 @@ const RegisterForm = () => {
             });
             if (response.ok) {
                 console.log('Form submitted successfully');
+                navigate('/'); // Redirect to login page
                 // Optionally, redirect or show a success message
             } else {
                 console.error('Failed to submit form');
@@ -63,7 +78,20 @@ const RegisterForm = () => {
                         required
                     />
                     <FaLock className="icon" />
+                    <FaInfoCircle className="info-icon" title="Password must be at least 8 characters long" />
                 </div>
+                <div className="input-box">
+                    <input
+                        type="password"
+                        name="confirmPassword"
+                        placeholder="Confirm Password"
+                        value={formData.confirmPassword}
+                        onChange={handleChange}
+                        required
+                    />
+                    <FaLock className="icon" />
+                </div>
+                {passwordError && <p className="error-message">{passwordError}</p>}
                 <div className="input-box">
                     <input
                         type="email"
